@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import { Loading, Text } from '@nextui-org/react';
 import { CommonUtility } from '@utility/common';
 import { skillsMap } from '@utility/constants/common';
+import MapViewer from '@elements/Google/mapViewer';
 
 const Container = styled.div`
   display: flex;
@@ -95,7 +96,7 @@ const RowRight = styled.div`
   align-items: flex-end;
 `
 
-const OrderRow = ({order}) =>{
+const OrderRow = ({order , showMapForOrder}) =>{
 
   const [ loading , setLoading ] = useState(false)
 
@@ -116,7 +117,7 @@ const OrderRow = ({order}) =>{
       <RowLeft>
         <p>Vendor Name <span>{order.vendorName}</span></p>
         <p>Problem <span>{skillsMap[order.problem] || order.problem}</span></p>
-        <p>Location <span>{order.location}</span> <MapButton>Mechanic on his way!</MapButton></p>
+        <p>Location <span>{order.location}</span> <MapButton onClick={() => showMapForOrder(order)} >Show Maps</MapButton></p>
         <p>Car Type <span>{order.carType}</span></p>
         {(!!order.time && !!order.date) ? <div>
             <Text h5 className='mt-3' >Appointment</Text>
@@ -139,14 +140,40 @@ const OrderRow = ({order}) =>{
 export default function OrderNow() {
 
   const {data: orders, loading} = orderUserProcess()
+  const [mapOpen, setMapOpen] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState(null)
+
+  const closeMap = () => {
+    setMapOpen(false);
+    setCurrentLocation(null);
+  }
+
+  const showMapForOrder = (order) => {
+    if(!order.latLng){
+      toast.error(commonConstants.constantErrorName);
+      return;
+    }
+
+    setCurrentLocation({
+      name: order.location,
+      latLng: order.latLng
+    });
+    setMapOpen(true);
+  }
 
   return (
     <Container>
       <AppTitle name="Process"/>
       {loading && <Loading/> }
       {orders.map((order)=>(
-        <OrderRow order={order} />
+        <OrderRow order={order} showMapForOrder={showMapForOrder} />
       ))}
+      <MapViewer
+        open={mapOpen}
+        onClose={closeMap}
+        latLng={currentLocation?.latLng}
+        placeName={currentLocation?.name}
+      />
     </Container>
   )
 }

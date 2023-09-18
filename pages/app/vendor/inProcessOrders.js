@@ -10,6 +10,8 @@ import toast from 'react-hot-toast';
 import { CommonUtility } from '@utility/common';
 import { Loading, Text } from '@nextui-org/react';
 import { skillsMap } from '@utility/constants/common';
+import MapViewer from '@elements/Google/mapViewer';
+import { commonConstants } from '@utility/constants/api';
 
 const Container = styled.div`
   display: flex;
@@ -54,7 +56,6 @@ const RowMain = styled.div`
 
 const RowLeft = styled.div`
   p{
-    width: 400px;
     font-weight: 700;
   }
   p span{
@@ -121,7 +122,7 @@ const ProfileImage = styled.img`
   border-radius: 50%;
 `;
 
-const OrderRow = ({order}) =>{
+const OrderRow = ({order , showMapForOrder}) =>{
 
   const [ loading , setLoading ] = useState(false)
   const [ cancelLoading , setCancelLoading ] = useState(false)
@@ -156,7 +157,7 @@ const OrderRow = ({order}) =>{
           {order.image? <ProfileImage src={order.image} /> : <User /> }
         </ImageContainer>
         <p>Name <span>{order.userName}</span></p>
-        <p>Location <span>{order.location}</span> <MapButton>Show maps</MapButton></p>
+        <p>Location <span>{order.location}</span> <MapButton onClick={()=>showMapForOrder(order)} >Show maps</MapButton></p>
         <p>Problem <span>{skillsMap[order.problem] || order.problem}</span></p>
         {(!!order.time && !!order.date) ? <div>
             <Text h5 className='mt-3' >Appointment</Text>
@@ -182,14 +183,43 @@ const OrderRow = ({order}) =>{
 export default function OrderNow() {
 
   const {data: orders, loading} = orderVendorProcess();
+
+  const [mapOpen, setMapOpen] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState(null)
+
+  const closeMap = () => {
+    setMapOpen(false);
+    setCurrentLocation(null);
+  }
+
+  const showMapForOrder = (order) => {
+    if(!order.latLng){
+      toast.error(commonConstants.constantErrorName);
+      return;
+    }
+
+    setCurrentLocation({
+      name: order.location,
+      latLng: order.latLng
+    });
+    setMapOpen(true);
+  }
+
   return (
     <Container>
       <AppTitle name="In-Process Orders"/>
       {loading && <Loading/> }
       {orders.map((order)=>(
-        <OrderRow order={order} />
+        <OrderRow order={order} showMapForOrder={showMapForOrder} />
       ))}
       {(!loading && orders.length === 0)? "Nothing here yet" : ''}
+
+      <MapViewer
+        open={mapOpen}
+        onClose={closeMap}
+        latLng={currentLocation?.latLng}
+        placeName={currentLocation?.name}
+      />
     </Container>
   )
 }

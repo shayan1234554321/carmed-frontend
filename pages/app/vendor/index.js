@@ -62,7 +62,6 @@ const RowMain = styled.div`
 
 const RowLeft = styled.div`
   p{
-    width: 450px;
     font-weight: 700;
   }
   p span{
@@ -129,7 +128,7 @@ const Schema = yup.object().shape({
   myBid: yup.number("Bid is required").required("Your bid is required"),
 });
 
-const OrderRow = ({ order, loadingBid, visbilityHandler, showMapForOrder ,userId, user}) => {
+const OrderRow = ({ order, loadingBid, visibilityHandler, showMapForOrder ,userId, user}) => {
 
   const [loading, setLoading] = useState(false)
   const url = order.userProfile
@@ -179,7 +178,7 @@ const OrderRow = ({ order, loadingBid, visbilityHandler, showMapForOrder ,userId
         </p>
         <span>
           <OutlinedButton onClick={acceptOrder} loading={loading} color={theme.colors.green}>Accept</OutlinedButton>
-          <OutlinedButton className="ml-2" color={theme.colors.blue} onClick={() => visbilityHandler(order)} loading={loadingBid} >{!!order.alreadyBid? "Update Bid":"Bid"}</OutlinedButton>
+          <OutlinedButton className="ml-2" color={theme.colors.blue} onClick={() => visibilityHandler(order)} loading={loadingBid} >{!!order.alreadyBid? "Update Bid":"Bid"}</OutlinedButton>
         </span>
       </RowRight>
     </RowMain>
@@ -196,7 +195,7 @@ export default function OrderNow() {
   const [mapOpen, setMapOpen] = useState(false);
   const [currentLocation, setCurrentLocation] = useState(null)
 
-  const visbilityHandler = (order) => setCurrentOrder(order);
+  const visibilityHandler = (order) => setCurrentOrder(order);
   const closeHandler = () => {
     setCurrentOrder(null);
   };
@@ -263,7 +262,7 @@ export default function OrderNow() {
           order={order}
           loadingBid={loadingBid}
           showMapForOrder={showMapForOrder}
-          visbilityHandler={visbilityHandler}
+          visibilityHandler={visibilityHandler}
           userId={user.id}
           user={user}
         />

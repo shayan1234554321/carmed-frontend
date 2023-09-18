@@ -152,6 +152,7 @@ const Schema = yup.object().shape({
 
 export default function SignUp() {
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth()
 
   const {
     handleSubmit,
@@ -170,8 +171,6 @@ export default function SignUp() {
     { text: "Female", value: 'female' }
   ];
 
-  const { login } = useAuth()
-
   const submit = async (data) => {
 
     const payload = {
@@ -179,13 +178,14 @@ export default function SignUp() {
     };
     delete payload.image;
     setLoading(true);
-    const avatar = data.image;
-    const fileObject = {
-      name: avatar.name,
-      type: avatar.type
-    }
+    
     try {
       if (data.image) {
+        const avatar = data.image;
+        const fileObject = {
+          name: avatar.name,
+          type: avatar.type
+        }
         const url = await UploadMediaService.getSignedUrl(fileObject);
         await axios.put(url, avatar);
         const imageUrl = url.split('?')[0];
@@ -196,8 +196,8 @@ export default function SignUp() {
 
       const res = await UserService.add(payload);
       if (res.token) {
-        login(res);
         UserService.storeUser(res);
+        login();
         push('/app')
       }
     } catch (error) {

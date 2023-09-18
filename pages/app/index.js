@@ -212,9 +212,6 @@ export default function OrderNow() {
       toast.error(commonConstants.constantErrorName);
       return;
     }
-    
-    console.log(order.location)
-    console.log(order.latLng)
 
     setMapOpen(true);
     setCurrentLocation({
