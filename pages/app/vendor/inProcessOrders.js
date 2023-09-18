@@ -102,19 +102,6 @@ const RowRight = styled.div`
   }
 `
 
-const ImageContainer = styled.div`
-  height: 60px;
-  width: 60px;
-  aspect-ratio: 1/1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid black;
-  border-radius: 50%;
-  margin: 20px 40px;
-  margin-left: 10px;
-`
-
 const ProfileImage = styled.img`
   width: 100%;
   height: 100%;
@@ -122,11 +109,25 @@ const ProfileImage = styled.img`
   border-radius: 50%;
 `;
 
+const ProfileImageContainer = styled.div`
+  width: 60px;
+  height: 60px;
+  border: 2px solid white;
+  margin: 10px;
+  margin-left: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  over-flow: hidden;
+`;
+
 const OrderRow = ({order , showMapForOrder}) =>{
 
   const [ loading , setLoading ] = useState(false)
   const [ cancelLoading , setCancelLoading ] = useState(false)
-
+  const url = order.userProfile
+  
   async function completeOrder(){
     try{
       setLoading(true);
@@ -153,9 +154,9 @@ const OrderRow = ({order , showMapForOrder}) =>{
   <OrderContainer>
     <RowMain>
       <RowLeft>
-        <ImageContainer>
-          {order.image? <ProfileImage src={order.image} /> : <User /> }
-        </ImageContainer>
+        <ProfileImageContainer>
+          {order.userProfile ? <ProfileImage src={url} /> : <User size={32} />}
+        </ProfileImageContainer>
         <p>Name <span>{order.userName}</span></p>
         <p>Location <span>{order.location}</span> <MapButton onClick={()=>showMapForOrder(order)} >Show maps</MapButton></p>
         <p>Problem <span>{skillsMap[order.problem] || order.problem}</span></p>
