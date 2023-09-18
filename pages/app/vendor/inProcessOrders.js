@@ -114,6 +114,13 @@ const ImageContainer = styled.div`
   margin-left: 10px;
 `
 
+const ProfileImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+`;
+
 const OrderRow = ({order}) =>{
 
   const [ loading , setLoading ] = useState(false)
@@ -146,7 +153,7 @@ const OrderRow = ({order}) =>{
     <RowMain>
       <RowLeft>
         <ImageContainer>
-          {order.image? <Image />: <User /> }
+          {order.image? <ProfileImage src={order.image} /> : <User /> }
         </ImageContainer>
         <p>Name <span>{order.userName}</span></p>
         <p>Location <span>{order.location}</span> <MapButton>Show maps</MapButton></p>

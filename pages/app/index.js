@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 import { CommonUtility } from '@utility/common';
 import { carTypesMap, skillsMap } from '@utility/constants/common';
 import { OrderNowPopup } from '@page-components/order/orderModal';
+import MapViewer from '@elements/Google/mapViewer';
 
 const Main = styled.div`
   position : relative;
@@ -120,13 +121,13 @@ const RequestsLength = styled.div`
   background-color: ${({ theme }) => theme.colors.red};
 `
 
-const OrderRow = ({ id, problem, location, carType, myBid, requestsLength, showOrder, order }) => {
+const OrderRow = ({ id, problem, location, carType, myBid, requestsLength, showMapForOrder, showOrder, order }) => {
   return (
     <OrderContainer>
       <RowMain>
         <RowLeft>
           <p>Problem <span>{skillsMap[problem] || problem}</span></p>
-          <p>Location <span>{location}</span> <MapButton>Show maps</MapButton></p>
+          <p>Location <span>{location}</span> <MapButton onClick={() => showMapForOrder(order)} >Show maps</MapButton></p>
           <p>Car Type <span>{carTypesMap[carType] || carType}</span></p>
           {(!!order.time && !!order.date) ? <div>
             <Text h5 className='mt-3' >Appointment</Text>
@@ -184,6 +185,8 @@ export default function OrderNow() {
   const { isVendor } = useAuth();
   const [visible, setVisible] = useState(false);
   const { push } = useRouter()
+  const [mapOpen, setMapOpen] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState(null)
 
   const handler = () => setVisible(true);
 
@@ -199,6 +202,27 @@ export default function OrderNow() {
     push('/app/vendor/')
   }
 
+  const closeMap = () => {
+    setMapOpen(false);
+    setCurrentLocation(null);
+  }
+
+  const showMapForOrder = (order) => {
+    if(!order.latLng){
+      toast.error(commonConstants.constantErrorName);
+      return;
+    }
+    
+    console.log(order.location)
+    console.log(order.latLng)
+
+    setMapOpen(true);
+    setCurrentLocation({
+      name: order.location,
+      latLng: order.latLng
+    });
+  }
+
   return (
     <Main>
       <Container>
@@ -206,7 +230,7 @@ export default function OrderNow() {
           <AppTitle name="Orders" />
           {loading && <Loading />}
           {orders.map((order) => (
-            <OrderRow order={order} showOrder={showOrder} id={order.id} problem={order.problem} location={order.location} carType={order.carType} myBid={order.bid} requestsLength={order.requests.length} />
+            <OrderRow order={order} showOrder={showOrder} id={order.id} showMapForOrder={showMapForOrder} problem={order.problem} location={order.location} carType={order.carType} myBid={order.bid} requestsLength={order.requests.length} />
           ))}
           {(!loading && orders.length === 0) ? "No orders yet" : ''}
         </div>
@@ -218,6 +242,12 @@ export default function OrderNow() {
           onClose={closeHandler}
         />
       </Container>
+      <MapViewer
+        open={mapOpen}
+        onClose={closeMap}
+        latLng={currentLocation?.latLng}
+        placeName={currentLocation?.name}
+      />
     </Main>
   )
 }

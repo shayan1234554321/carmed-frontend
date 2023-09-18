@@ -45,6 +45,7 @@ export const OrderNowPopup = ({ open, onClose }) => {
 
   const [isAppointment, setIsAppointment] = useState(false);
   const [modal, setModal] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const { user } = useAuth();
 
@@ -79,9 +80,10 @@ export const OrderNowPopup = ({ open, onClose }) => {
   }
 
   const submit = async (data) => {
+    if(destination.name !== "" ){
       const payload = {
         ...data,
-        location: "Nowshera",
+        location: destination.name,
         userId: user.id,
         userName: user.name,
         userProfile: user.profile,
@@ -92,14 +94,19 @@ export const OrderNowPopup = ({ open, onClose }) => {
         requests: []
       }
       try {
+        setLoading(true)
         await UserService.order(payload);
         toast.success("Order Placed")
       } catch (error) {
         toast.error("Invalid credentials")
       } finally {
+        setLoading(false)
         reset({})
         onClose()
       }
+    }else{
+      toast.error("Location is Required")
+    }
   }
 
   return (<>
@@ -119,7 +126,7 @@ export const OrderNowPopup = ({ open, onClose }) => {
           <InputsContainer >
             <DropdownFormField
               control={control}
-              hint={errors?.name?.message}
+              hint={errors?.problem?.message}
               label={'Problem'}
               name="problem"
               placeholder={'Engine'}
@@ -128,7 +135,7 @@ export const OrderNowPopup = ({ open, onClose }) => {
             />
             <DropdownFormField
               control={control}
-              hint={errors?.name?.message}
+              hint={errors?.carType?.message}
               label={'Car Type'}
               name="carType"
               placeholder={'Sedan'}
@@ -153,7 +160,7 @@ export const OrderNowPopup = ({ open, onClose }) => {
             </div>
             <InputFormField
               control={control}
-              hint={errors?.name?.message}
+              hint={errors?.bid?.message}
               label={'My Bid'}
               name="bid"
               placeholder={'PKR'}
@@ -188,7 +195,7 @@ export const OrderNowPopup = ({ open, onClose }) => {
         </form>
       </Modal.Body>
       <Modal.Footer>
-        <OutlinedButton color={theme.colors.green} size={15} onClick={() => handleSubmit(submit)()} >
+        <OutlinedButton color={theme.colors.green} size={15} onClick={() => handleSubmit(submit)()} loading={loading}>
           Place Order
         </OutlinedButton>
         <OutlinedButton onClick={onClose} size={15} color={theme.colors.red} >

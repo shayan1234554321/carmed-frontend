@@ -13,7 +13,7 @@ import { CommonUtility } from '@utility/common';
 import { useForm } from "react-hook-form";
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Loading, Modal, Text } from '@nextui-org/react';
+import { Loading, Modal, Text , Checkbox } from '@nextui-org/react';
 import AddressPopup from '@elements/Google/addressSelector';
 import { carTypeOptions, carTypesMap, skillsMap, skillsOption } from '@utility/constants/common';
 import { DropdownFormField } from '@elements/dropdown';
@@ -187,6 +187,7 @@ const Details = ({ order, orderLoading }) => {
   const { push } = useRouter();
   const [loading, setLoading] = useState(false)
   const [modal, setModal] = useState(false);
+  const [isAppointment, setIsAppointment] = useState(false);
   const [destination, setDestination] = useState({
     name: "",
     lat: '',
@@ -232,10 +233,8 @@ const Details = ({ order, orderLoading }) => {
 
   const submit = (data) => {
     const payload = {
-      problem: data.problem,
+      ...data,
       location: destination.name || order.location,
-      carType: data.carType,
-      bid: data.bid,
       id: order.id
     }
     try {
@@ -308,7 +307,7 @@ const Details = ({ order, orderLoading }) => {
             <InputsContainer>
               <DropdownFormField
                 control={control}
-                hint={errors?.name?.message}
+                hint={errors?.problem?.message}
                 label={'Problem'}
                 name="problem"
                 width={'15vw'}
@@ -319,7 +318,7 @@ const Details = ({ order, orderLoading }) => {
               />
               <DropdownFormField
                 control={control}
-                hint={errors?.name?.message}
+                hint={errors?.carType?.message}
                 label={'Car Type'}
                 name="carType"
                 width={'15vw'}
@@ -346,7 +345,7 @@ const Details = ({ order, orderLoading }) => {
               </div>
                 <InputFormField
                   control={control}
-                  hint={errors?.name?.message}
+                  hint={errors?.bid?.message}
                   label={'My Bid'}
                   name="bid"
                   placeholder={'--- PKR'}
@@ -354,6 +353,32 @@ const Details = ({ order, orderLoading }) => {
                   defaultValue={order.bid}
                 />
             </InputsContainer>
+            <Checkbox isSelected={isAppointment} onChange={setIsAppointment} color="success">
+            <Text size={14} >Make an Appointment</Text>
+          </Checkbox>
+          {isAppointment && <>
+            <Text className="my-3" >Select suitable time and get appropriate bids</Text>
+            <InputFormField
+              width="186px"
+              control={control}
+              hint={errors?.time?.message}
+              name='time'
+              label="Time"
+              type="time"
+              required
+              defaultValue={order.time}
+            />
+            <InputFormField
+              width="186px"
+              control={control}
+              hint={errors?.date?.message}
+              name='date'
+              label="Date"
+              type="date"
+              required
+              defaultValue={order.date}
+            />
+          </>}
             <AddressPopup
               open={modal}
               onClose={onCloseCalled}

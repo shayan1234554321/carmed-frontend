@@ -1,0 +1,3 @@
+- Show maps
+- User signup loading 
+- Image not working from AWS

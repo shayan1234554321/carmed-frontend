@@ -139,15 +139,11 @@ const OrderRow = ({ order, loadingBid, visbilityHandler, showMapForOrder ,userId
     try {
       setLoading(true);
       const payload = {
+        ...order ,
         vendorId: user.id,
         vendorName: user.name,
         price: order.bid,
         id: order.id,
-        carType: order.carType,
-        location: order.location,
-        problem: order.problem,
-        userId: order.userId,
-        userName: order.userName,
       }
       await VendorService.acceptOrder(payload);
       toast.success("Order Accepted")

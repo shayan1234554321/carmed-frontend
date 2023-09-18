@@ -67,7 +67,7 @@ export const DropdownFormField = ({
                 name={name}
                 defaultValue={defaultValue}
                 render={({
-                    field: { onChange, value, ref },
+                    field: { onChange, value = defaultValue || "", ref },
                     fieldState: { error },
                 }) => (<>
                     {label && <h6 className="mb-1" >{label}</h6>}
